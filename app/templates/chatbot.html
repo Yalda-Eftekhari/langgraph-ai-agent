@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advisory Firms AI Agent</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .chat-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .chat-header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 70%;
+        }
+        .user-message {
+            background: #007bff;
+            color: white;
+            margin-left: auto;
+        }
+        .ai-message {
+            background: #e9ecef;
+            color: #333;
+        }
+        .chat-input {
+            display: flex;
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #dee2e6;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .chat-input button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .chat-input button:hover {
+            background: #0056b3;
+        }
+        .sql-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #495057;
+        }
+        .data-display {
+            background: #e8f5e8;
+            border: 1px solid #28a745;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        .error-display {
+            background: #f8d7da;
+            border: 1px solid #dc3545;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            color: #721c24;
+        }
+        .success-display {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            color: #155724;
+        }
+        .examples {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .example-query {
+            background: #e9ecef;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .example-query:hover {
+            background: #dee2e6;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 4px 6px;
+            text-align: left;
+        }
+        .data-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .data-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🤖 Advisory Firms AI Agent</h1>
+            <p>Ask me anything about advisory firms, clients, and consultants!</p>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message ai-message">
+                Hello! I'm your AI assistant for advisory firms data. I can help you with:
+                <ul>
+                    <li>Finding information about advisory firms</li>
+                    <li>Querying client data</li>
+                    <li>Searching for consultants</li>
+                    <li>Adding new records</li>
+                    <li>Updating existing data</li>
+                    <li>Deleting records</li>
+                </ul>
+                Try asking me something like "Show me all advisory firms" or "Find consultants with more than 10 years of experience"
+            </div>
+        </div>
+        
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Type your query here..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <div class="examples">
+        <h3>💡 Example Queries</h3>
+        <div class="example-query" onclick="useExample(this)">Show me all advisory firms</div>
+        <div class="example-query" onclick="useExample(this)">Find consultants with more than 10 years of experience</div>
+        <div class="example-query" onclick="useExample(this)">List all clients in the technology industry</div>
+        <div class="example-query" onclick="useExample(this)">Show advisory firms with revenue over 5000 million</div>
+        <div class="example-query" onclick="useExample(this)">Find consultants with PMP certification</div>
+        <div class="example-query" onclick="useExample(this)">Add a new advisory firm called TechAdvisors</div>
+        <div class="example-query" onclick="useExample(this)">Delete the client with name TechCorp Inc</div>
+        <div class="example-query" onclick="useExample(this)">Update the revenue for McKinsey to 13000 million</div>
+    </div>
+
+    <script>
+        function addMessage(content, isUser = false, sqlQuery = '', data = null, error = null) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+            
+            let messageContent = content;
+            
+            // Add SQL query display if available
+            if (sqlQuery) {
+                messageContent += `<div class="sql-display"><strong>Generated SQL:</strong><br>${sqlQuery}</div>`;
+            }
+            
+            // Add data display if available
+            if (data && data.length > 0) {
+                let dataHtml = '<div class="data-display"><strong>Results:</strong><br>';
+                
+                // Create a table for better data display
+                if (data.length > 0 && typeof data[0] === 'object') {
+                    const columns = Object.keys(data[0]);
+                    dataHtml += '<div class="table-container"><table class="data-table"><thead><tr>';
+                    columns.forEach(col => {
+                        dataHtml += `<th>${col}</th>`;
+                    });
+                    dataHtml += '</tr></thead><tbody>';
+                    
+                    data.forEach(row => {
+                        dataHtml += '<tr>';
+                        columns.forEach(col => {
+                            let value = row[col];
+                            if (value === null) value = 'NULL';
+                            if (Array.isArray(value)) value = value.join(', ');
+                            dataHtml += `<td>${value}</td>`;
+                        });
+                        dataHtml += '</tr>';
+                    });
+                    
+                    dataHtml += '</tbody></table></div>';
+                } else {
+                    data.forEach(row => {
+                        dataHtml += JSON.stringify(row, null, 2) + '<br>';
+                    });
+                }
+                
+                dataHtml += '</div>';
+                messageContent += dataHtml;
+            }
+            
+            // Add error display if available
+            if (error) {
+                messageContent += `<div class="error-display"><strong>Error:</strong> ${error}</div>`;
+            }
+            
+            // Add success message for non-SELECT operations
+            if (!error && !data && sqlQuery && !sqlQuery.toUpperCase().includes('SELECT')) {
+                messageContent += `<div class="success-display"><strong>Success!</strong> Operation completed successfully.</div>`;
+            }
+            
+            messageDiv.innerHTML = messageContent;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function sendMessage() {
+            const userInput = document.getElementById('userInput');
+            const query = userInput.value.trim();
+            
+            if (!query) return;
+            
+            // Add user message
+            addMessage(query, true);
+            
+            // Clear input
+            userInput.value = '';
+            
+            // Show typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message ai-message';
+            typingDiv.innerHTML = '🤔 Processing your request...';
+            document.getElementById('chatMessages').appendChild(typingDiv);
+            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+            
+            // Send to API
+            fetch('/api/query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: query })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Remove typing indicator
+                typingDiv.remove();
+                
+                addMessage(
+                    data.response, 
+                    false, 
+                    data.sql_query, 
+                    data.data, 
+                    data.error
+                );
+            })
+            .catch(error => {
+                // Remove typing indicator
+                typingDiv.remove();
+                
+                addMessage('Sorry, I encountered an error processing your request.', false, '', null, error.message);
+            });
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function useExample(element) {
+            const query = element.textContent;
+            document.getElementById('userInput').value = query;
+            sendMessage();
+        }
+    </script>
+</body>
+</html>
+

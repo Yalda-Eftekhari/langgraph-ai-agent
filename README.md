@@ -158,15 +158,16 @@ langgraph/
 │   ├── __init__.py
 │   ├── main.py              # FastAPI application
 │   ├── database.py          # Database models and connection
-│   ├── ai_agent_simple.py   # AI agent (LangGraph-inspired)
+│   ├── ai_agent.py          # AI agent (LangGraph-inspired)
 │   └── templates/
 │       └── chatbot.html     # Web interface
-├── ollama/                  # Ollama binary and models
+├── tests/                   # Test files
+│   ├── test_database_operations.py
+│   ├── test_direct_db_operations.py
+│   └── test_system.py
 ├── requirements.txt          # Python dependencies
-├── Dockerfile               # Container configuration
-├── docker-compose.yml       # Service orchestration
-├── init.sql                # Database initialization
 ├── Makefile                 # Project management commands
+├── .gitignore              # Git ignore rules
 └── .github/workflows/       # CI/CD pipeline
 ```
 

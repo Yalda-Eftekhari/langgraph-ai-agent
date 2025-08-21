@@ -1,6 +1,6 @@
 # Advisory Firms AI Agent
 
-A sophisticated AI agent built with LangGraph that can interact with a SQLite database to perform complex data operations based on natural language requests. This project demonstrates advanced AI development, database integration, and modern software engineering practices.
+A sophisticated AI agent built with LangGraph that can interact with a SQLite database to perform complex data operations based on natural language requests.
 
 ## 🚀 Features
 
@@ -12,57 +12,26 @@ A sophisticated AI agent built with LangGraph that can interact with a SQLite da
 - **Conversational Memory**: Maintains context across multiple interactions
 - **Modern Web Interface**: Clean, responsive chatbot interface
 
-## 🏗️ Architecture
-
-### Technology Stack
+## 🏗️ Technology Stack
 
 - **Backend**: FastAPI (Python 3.11)
 - **AI Framework**: LangChain + Custom AI Agent (LangGraph-inspired)
 - **LLM**: Ollama (local deployment)
 - **Database**: SQLite
 - **ORM**: SQLAlchemy
-- **Containerization**: Docker
-- **CI/CD**: GitHub Actions
-- **Project Management**: Make
 
-### Why These Choices?
+## 🤔 Why Ollama?
 
-1. **FastAPI**: Chosen for its high performance, automatic API documentation, and modern async support
-2. **Custom AI Agent**: Implements LangGraph-inspired workflow patterns with natural language understanding and SQL generation
-3. **SQLite**: Lightweight, file-based database with excellent support for complex queries and relationships
-4. **Ollama**: Local LLM deployment ensures data privacy and eliminates API costs
-5. **Docker**: Ensures consistent deployment across environments
-
-### System Design
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Web Interface │    │   FastAPI App   │    │   SQLite        │
-│   (HTML/JS)    │◄──►│   + LangGraph   │◄──►│   Database      │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                │
-                                ▼
-                       ┌─────────────────┐
-                       │   Ollama LLM    │
-                       │   (Local)       │
-                       └─────────────────┘
-```
-
-## 🗄️ Database Schema
-
-The system includes three main tables with realistic advisory firm data:
-
-- **advisory_firms**: Company information, revenue, services, etc.
-- **clients**: Client projects and relationships
-- **consultants**: Professional profiles and specializations
+Local LLM deployment ensures data privacy, eliminates API costs, and avoids regional restrictions that can occur with cloud-based services like OpenAI and Anthropic.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Docker and Docker Compose
+- Python 3.11+
 - Git
 - Make
+- Ollama (for local LLM deployment)
 
 ### 1. Clone and Setup
 
@@ -71,7 +40,22 @@ git clone <repository-url>
 cd langgraph
 ```
 
-### 2. Complete Setup (One Command!)
+### 2. Setup Ollama
+
+First, you need to set up Ollama for local LLM deployment:
+
+```bash
+# Download and install Ollama
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Start Ollama service
+ollama serve
+
+# Pull a model (in another terminal)
+ollama pull llama2:7b  # or any other model you prefer
+```
+
+### 3. Complete Setup (One Command!)
 
 ```bash
 make setup
@@ -80,18 +64,15 @@ make setup
 This will:
 - Create virtual environment
 - Install all dependencies
-- Setup Ollama with required model
 - Prepare everything for launch
 
-**Note**: Make sure you have extracted the `ollama-linux-amd64.tgz.1` file to the `ollama/` directory first.
-
-### 3. Start the Application
+### 4. Start the Application
 
 ```bash
 make start
 ```
 
-### 4. Access the Application
+### 5. Access the Application
 
 - **Web Interface**: http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
@@ -244,16 +225,24 @@ If you encounter issues:
 
 2. **Ollama Issues**:
    ```bash
-   make stop
-   make setup-ollama
-   make start
+   # Check if Ollama is running
+   ollama list
+   
+   # Restart Ollama service
+   sudo systemctl restart ollama
+   
+   # Or manually start
+   ollama serve
+   
+   # Check model availability
+   ollama pull llama2:7b
    ```
 
 3. **Database Issues**:
    ```bash
-   make stop
-   docker-compose down -v
-   make start
+   # SQLite database is automatically created
+   # Check if database file exists
+   ls -la *.db
    ```
 
 4. **Check System Status**:
